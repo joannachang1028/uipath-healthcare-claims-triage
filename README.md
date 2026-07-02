@@ -34,7 +34,7 @@ The automation:
 
 **Main workflow overview:**
 
-![Workflow overview](screenshots/workflow-overview.png)
+![Workflow overview](screenshots/workflow_overview.png)
 
 **Validation logic (part 1):**
 
@@ -85,7 +85,7 @@ All five test scenarios passed with expected outputs:
 
 ![Orchestrator deployment](screenshots/orchestrator-deployment.png)
 
-![Unattended job logs](screenshots/unattended-job-logs.png)
+![Output job logs](screenshots/output-log-message.png)
 
 ## Repository Structure
 
@@ -101,7 +101,7 @@ uipath-healthcare-claims-triage/
     ├── validation-logic-part-1.png
     ├── validation-logic-part-2.png
     ├── orchestrator-deployment.png
-    └── unattended-job-logs.png
+    └── output-log-message.png
 ```
 
 ## Getting Started
