@@ -1,25 +1,25 @@
-# Healthcare Claims Exception Triage Automation
+# UiPath Healthcare Claims Triage Automation
 
-A UiPath Studio Web RPA workflow that validates synthetic healthcare claims and routes exceptions for human review.
+A UiPath Studio Web RPA workflow that validates synthetic healthcare claims, assigns processing status, and routes incomplete or high-cost records for human review.
 
 ## Project Overview
 
-Healthcare claims may require manual review when required information is missing or when a claim exceeds a defined cost threshold. This workflow automates the initial validation process and assigns each claim one of two statuses:
+Healthcare claims processing often requires manual review when claims contain missing information or exceed cost thresholds. This workflow automates the initial validation step, evaluating each claim against defined business rules and assigning it a status:
 
-- `Ready for Processing`
-- `Needs Human Review`
+- **Ready for Processing** — Claim is complete and within cost threshold
+- **Needs Human Review** — Claim requires attention due to missing data or high cost
 
-The project demonstrates workflow design, conditional routing, debugging, unattended execution, and deployment through UiPath Orchestrator.
+The project demonstrates core RPA capabilities including workflow design, conditional routing, debugging, unattended execution, and deployment through UiPath Orchestrator.
 
-## Workflow
+## Workflow Overview
 
 The automation:
 
-1. Loads five synthetic healthcare claims.
-2. Iterates through each claim.
-3. Checks the claim against three validation rules.
-4. Assigns a processing status and review reason.
-5. Records the result in UiPath execution logs.
+1. Loads five synthetic healthcare claims from test data
+2. Iterates through each claim record
+3. Validates against three business rules
+4. Assigns a processing status and review reason
+5. Logs results to UiPath execution logs
 
 ## Decision Rules
 
@@ -28,25 +28,29 @@ The automation:
 | Member ID is missing | Needs Human Review | Missing Member ID |
 | CPT Code is missing | Needs Human Review | Missing CPT Code |
 | Claim amount exceeds $1,000 | Needs Human Review | High-cost claim |
-| No exception detected | Ready for Processing | — |
+| No exceptions detected | Ready for Processing | — |
 
-## Workflow Overview
+## Workflow Diagrams
+
+**Main workflow overview:**
 
 ![Workflow overview](screenshots/workflow-overview.png)
 
-## Decision Logic
+**Validation logic (part 1):**
 
 ![Validation logic part 1](screenshots/validation-logic-part-1.png)
 
+**Validation logic (part 2):**
+
 ![Validation logic part 2](screenshots/validation-logic-part-2.png)
 
-## Debugging and Iteration
+## Debugging & Troubleshooting
 
-The first version used multiple sequential `If` blocks. A later `Else` branch could overwrite a status assigned by an earlier validation rule.
+### Initial Issue
+The first version used sequential `If` blocks, which caused later conditions to overwrite earlier assignments. For example, a claim flagged as "Needs Human Review" for missing Member ID could be changed back to "Ready for Processing" by a subsequent CPT Code check.
 
-For example, a claim with a missing Member ID was initially marked `Needs Human Review`, but a later CPT Code check changed it back to `Ready for Processing`.
-
-I added diagnostic logging to inspect the actual Member ID value and string length:
+### Solution
+I added diagnostic logging to inspect actual values:
 
 ```vb
 "Claim ID: " + CurrentRow("Claim ID").ToString() +
@@ -54,29 +58,30 @@ I added diagnostic logging to inspect the actual Member ID value and string leng
 "] | Length: " + CurrentRow("Member ID").ToString().Length.ToString()
 ```
 
-I then restructured the validation rules as nested conditions so that each claim receives one final status without being overwritten.
+Then restructured the validation logic as nested conditions, ensuring each claim receives exactly one final status without being overwritten.
 
 ## Test Results
+
+All five test scenarios passed with expected outputs:
 
 | Claim ID | Test Scenario | Final Status | Reason |
 |---|---|---|---|
 | C001 | Complete claim | Ready for Processing | — |
 | C002 | Missing Member ID | Needs Human Review | Missing Member ID |
 | C003 | Missing CPT Code | Needs Human Review | Missing CPT Code |
-| C004 | High-cost claim | Needs Human Review | High-cost claim |
+| C004 | High-cost claim ($2,500) | Needs Human Review | High-cost claim |
 | C005 | Complete claim | Ready for Processing | — |
 
-All five test cases produced the expected results.
+## Deployment & Execution
 
-## Deployment
+**Built and deployed using:**
+- UiPath Studio Web
+- Solution version: 1.0.0
+- Deployment method: UiPath Orchestrator
+- Execution mode: Unattended RPA
+- Performance: ~5.6 seconds per execution
 
-The workflow was:
-
-- Built in UiPath Studio Web
-- Published as solution version `1.0.0`
-- Deployed through UiPath Orchestrator
-- Executed as an unattended RPA job
-- Completed successfully in approximately 5.6 seconds
+**Deployment screenshots:**
 
 ![Orchestrator deployment](screenshots/orchestrator-deployment.png)
 
@@ -84,13 +89,13 @@ The workflow was:
 
 ## Repository Structure
 
-```text
+```
 uipath-healthcare-claims-triage/
-├── README.md
+├── README.md                              # This file
 ├── solution/
-│   └── Healthcare-Claims-Triage.uis
+│   └── Healthcare-Claims-Triage.uis      # UiPath solution package
 ├── data/
-│   └── synthetic-claims.csv
+│   └── synthetic-claims.csv              # Test data (5 sample claims)
 └── screenshots/
     ├── workflow-overview.png
     ├── validation-logic-part-1.png
@@ -99,39 +104,52 @@ uipath-healthcare-claims-triage/
     └── unattended-job-logs.png
 ```
 
-## Running the Project
+## Getting Started
 
-1. Download the `.uis` solution package from the `solution` folder.
-2. Sign in to UiPath Automation Cloud.
-3. Open UiPath Studio Web.
-4. Import the solution package.
-5. Review the synthetic claim data and validation rules.
-6. Run the workflow or publish it to UiPath Orchestrator.
+### Prerequisites
+- UiPath Automation Cloud account
+- UiPath Studio Web access
 
-UiPath product availability and import options may vary by account license and tenant configuration.
+### Steps to Run
+
+1. Download the `.uis` solution package from the `solution/` folder
+2. Sign in to your UiPath Automation Cloud account
+3. Open UiPath Studio Web
+4. Import the solution package
+5. Review the validation rules and test claim data
+6. **Test locally:** Run the workflow in Studio Web
+7. **Deploy:** Publish to UiPath Orchestrator and execute as an unattended job
+
+> **Note:** UiPath product availability and import options may vary based on your account license and tenant configuration.
 
 ## Skills Demonstrated
 
-- UiPath Studio Web
-- UiPath Orchestrator
-- RPA workflow development
-- Conditional exception routing
-- Healthcare claims workflow modeling
-- Unattended automation
-- Execution logging
-- Workflow debugging
-- Human-in-the-loop process design
+- **UiPath Studio Web** — Workflow design and debugging
+- **UiPath Orchestrator** — Deployment and unattended execution
+- **RPA Development** — Exception handling, conditional logic, data validation
+- **Healthcare Domain** — Claims triage workflows, human-in-the-loop process design
+- **Execution Logging** — Diagnostic output and performance monitoring
+- **Workflow Optimization** — Debugging nested conditions, avoiding logic overwrites
 
-## Future Improvements
+## Future Enhancements
 
-- Load claims from Google Sheets, CSV, or a claims API
-- Write results to a structured output file
-- Use an Orchestrator Queue for claim processing
-- Add retry and exception-handling logic
-- Create a human-review workflow for flagged claims
+- Load claims from Google Sheets, CSV, or external claims API
+- Write validated results to structured output files (Excel, JSON)
+- Integrate with UiPath Orchestrator Queues for claim processing
+- Implement retry logic and advanced exception handling
+- Create a human-review queue and approval workflow
 - Add configurable validation thresholds
-- Track processing volume, exception rate, and processing time
+- Track KPIs: processing volume, exception rate, processing time per claim
 
-## Data and Privacy
+## Data & Privacy
 
-This project uses synthetic data only. It contains no real patient information, protected health information, or production credentials.
+⚠️ **This project uses synthetic test data only.** It contains:
+- No real patient information
+- No protected health information (PHI)
+- No production credentials or sensitive data
+
+All claims are fictional for demonstration purposes.
+
+## License
+
+This project is provided as-is for educational and portfolio demonstration purposes.
