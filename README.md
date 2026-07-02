@@ -34,6 +34,24 @@ The automation:
 
 **Main workflow overview:**
 
+Generate synthetic claim data
+        |
+For each claim
+        |
+Is Member ID missing?
+  Yes -> Needs Human Review: Missing Member ID
+  No
+        |
+Is CPT Code missing?
+  Yes -> Needs Human Review: Missing CPT Code
+  No
+        |
+Is Amount > $1,000?
+  Yes -> Needs Human Review: High-cost claim
+  No  -> Ready for Processing
+        |
+Log final triage result
+
 ![Workflow overview](screenshots/workflow_overview.png)
 
 **Validation logic (part 1):**
