@@ -34,23 +34,22 @@ The automation:
 
 **Main workflow overview:**
 
-Generate synthetic claim data
-        |
-For each claim
-        |
-Is Member ID missing?
-  Yes -> Needs Human Review: Missing Member ID
-  No
-        |
-Is CPT Code missing?
-  Yes -> Needs Human Review: Missing CPT Code
-  No
-        |
-Is Amount > $1,000?
-  Yes -> Needs Human Review: High-cost claim
-  No  -> Ready for Processing
-        |
-Log final triage result
+```mermaid
+flowchart TD
+    A[Generate synthetic claim data] --> B[For each claim]
+    B --> C{Is Member ID missing?}
+    C -- Yes --> D[Needs Human Review:<br/>Missing Member ID]
+    C -- No --> E{Is CPT Code missing?}
+    E -- Yes --> F[Needs Human Review:<br/>Missing CPT Code]
+    E -- No --> G{Is Amount greater than $1,000?}
+    G -- Yes --> H[Needs Human Review:<br/>High-cost claim]
+    G -- No --> I[Ready for Processing]
+
+    D --> J[Log final triage result]
+    F --> J
+    H --> J
+    I --> J
+```
 
 ![Workflow overview](screenshots/workflow_overview.png)
 
